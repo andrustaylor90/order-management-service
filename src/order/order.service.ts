@@ -1,4 +1,3 @@
-// order.service.ts
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
@@ -6,6 +5,7 @@ import { CreateOrderDto, UpdateOrderDto } from './order.dto';
 import { Order, OrderStatus } from './order.entity';
 import { CustomerService } from '../customer/customer.service';
 import { InventoryService } from '../inventory/inventory.service';
+import { KafkaProducerService } from '../kafka-producer/kafka-producer.service';
 
 @Injectable()
 export class OrderService {
@@ -15,8 +15,8 @@ export class OrderService {
     @InjectDataSource() private readonly dataSource: DataSource,
     private readonly customerService: CustomerService,
     private readonly inventoryService: InventoryService,
+    private readonly kafkaProducerService: KafkaProducerService,
   ) {
-    // Initialize the repository from the DataSource
     this.orderRepository = this.dataSource.getRepository(Order);
   }
 
@@ -38,7 +38,12 @@ export class OrderService {
     }
 
     const order = this.orderRepository.create(createOrderDto);
-    return await this.orderRepository.save(order);
+    await this.orderRepository.save(order);
+
+    // Send order to Kafka for further processing
+    await this.kafkaProducerService.sendMessage('orders', order);
+
+    return order;
   }
 
   async updateOrderStatus(id: string, status: OrderStatus): Promise<Order> {

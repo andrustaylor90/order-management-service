@@ -5,6 +5,7 @@ import { OrderController } from './order.controller';
 import { Order } from './order.entity';
 import { CustomerModule } from '../customer/customer.module';
 import { InventoryModule } from '../inventory/inventory.module';
+import { KafkaProducerService } from '../kafka-producer/kafka-producer.service';
 
 @Module({
   imports: [
@@ -13,6 +14,6 @@ import { InventoryModule } from '../inventory/inventory.module';
     InventoryModule,
   ],
   controllers: [OrderController],
-  providers: [OrderService],
+  providers: [OrderService, KafkaProducerService],
 })
 export class OrderModule {}

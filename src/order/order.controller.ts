@@ -1,4 +1,5 @@
 import { Controller, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { RateLimit } from 'nestjs-rate-limiter';
 import { OrderService } from './order.service';
 import { CreateOrderDto, UpdateOrderDto } from './order.dto';
 import { OrderStatus } from './order.entity';
@@ -8,6 +9,7 @@ export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
   @Post()
+  @RateLimit({ points: 5, duration: 60 }) // Allow 5 requests per 60 seconds per IP
   createOrder(@Body() createOrderDto: CreateOrderDto) {
     return this.orderService.createOrder(createOrderDto);
   }

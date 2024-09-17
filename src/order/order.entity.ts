@@ -1,5 +1,4 @@
-
-import { Entity, Column, PrimaryGeneratedColumn, UpdateDateColumn, CreateDateColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
 export enum OrderStatus {
   PROCESSING = 'processing',
@@ -7,7 +6,7 @@ export enum OrderStatus {
   DELIVERED = 'delivered',
 }
 
-@Entity() // Ensure this decorator is present
+@Entity('orders')
 export class Order {
   @PrimaryGeneratedColumn('uuid')
   id: string;
